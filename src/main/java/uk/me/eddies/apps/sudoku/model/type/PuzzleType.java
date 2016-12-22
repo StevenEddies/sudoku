@@ -37,7 +37,6 @@ public final class PuzzleType <C extends Coordinate> {
 		this.cells.forEach(Objects::requireNonNull);
 		
 		this.groups = unmodifiableSet(new LinkedHashSet<>(groups));
-		this.groups.forEach(Objects::requireNonNull);
 		this.groups.forEach(g -> g.requireSize(this.size));
 		this.groups.forEach(g -> g.validateCells(this.cells));
 		
