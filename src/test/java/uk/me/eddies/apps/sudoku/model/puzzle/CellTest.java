@@ -36,12 +36,17 @@ public class CellTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldFailToConstructWithNegativePuzzleSize() {
-		new Cell<>(COORD, OptionalInt.of(5), -1);
+		new Cell<>(COORD, OptionalInt.empty(), -1);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldFailToConstructWithZeroPuzzleSize() {
-		new Cell<>(COORD, OptionalInt.of(5), 0);
+		new Cell<>(COORD, OptionalInt.empty(), 0);
+	}
+	
+	@Test
+	public void shouldSuccessfullyConstructWithOnePuzzleSize() {
+		new Cell<>(COORD, OptionalInt.of(0), 1);
 	}
 	
 	@Test
