@@ -38,18 +38,13 @@ public final class PuzzleType <C extends Coordinate> {
 		
 		this.groups = unmodifiableSet(new LinkedHashSet<>(groups));
 		this.groups.forEach(Objects::requireNonNull);
-		this.groups.forEach(g -> {
-			if (g.getPuzzleSize() != this.size) throw new IllegalArgumentException("Invalid group size.");
-		});
-		if (!this.groups.stream()
-				.flatMap(g -> g.getCells().stream())
-				.allMatch(cells::contains)) {
-			throw new IllegalArgumentException("Group contains an invalid cell.");
-		}
+		this.groups.forEach(g -> g.requireSize(this.size));
+		this.groups.forEach(g -> g.validateCells(this.cells));
 		
 		this.valueTokens = unmodifiableList(new ArrayList<>(valueTokens));
 		this.valueTokens.forEach(Objects::requireNonNull);
-		if (this.valueTokens.size() != this.size) throw new IllegalArgumentException("Invalid value tokens size.");
+		if (this.valueTokens.size() != this.size)
+			throw new IllegalArgumentException("Invalid value tokens size.");
 	}
 
 	public String getName() {
@@ -71,7 +66,7 @@ public final class PuzzleType <C extends Coordinate> {
 	public List<String> getValueTokens() {
 		return valueTokens;
 	}
-
+	
 	@Override
 	public String toString() {
 		return getName();

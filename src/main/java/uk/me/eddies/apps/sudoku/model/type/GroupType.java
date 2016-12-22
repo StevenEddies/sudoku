@@ -4,6 +4,7 @@ package uk.me.eddies.apps.sudoku.model.type;
 
 import static java.util.Collections.unmodifiableSet;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -25,8 +26,14 @@ public final class GroupType <C extends Coordinate> {
 		return cells;
 	}
 	
-	int getPuzzleSize() {
-		return cells.size();
+	void requireSize(int requiredSize) {
+		if (cells.size() != requiredSize)
+			throw new IllegalArgumentException("Invalid group size.");
+	}
+	
+	void validateCells(Collection<C> validCells) {
+		if (!cells.stream().allMatch(validCells::contains))
+			throw new IllegalArgumentException("Group contains an invalid cell.");
 	}
 
 	@Override

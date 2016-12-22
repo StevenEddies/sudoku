@@ -4,6 +4,7 @@ package uk.me.eddies.apps.sudoku.model.type;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -41,14 +42,9 @@ public class GroupTypeTest {
 	}
 	
 	@Test
-	public void shouldMakeCellCountAvailable() {
-		assertThat(systemUnderTest.getPuzzleSize(), equalTo(2));
-	}
-	
-	@Test
 	public void shouldNotReactToInputCollectionChanges() {
 		cells.clear();
-		assertThat(systemUnderTest.getPuzzleSize(), equalTo(2));
+		assertThat(systemUnderTest.getCells(), hasSize(2));
 	}
 	
 	@Test(expected=UnsupportedOperationException.class)
