@@ -54,8 +54,8 @@ task testJar(type: Jar) {
 
 task setBuildProperties << {
 	def props = new Properties()
-	props.put('uk.me.eddies.apps.sudoku.version', version)
-	def writer = new FileWriter(file('src/main/resources/uk/me/eddies/apps/sudoku/build.properties'))
+	props.put('uk.me.eddies.apps.sudoku.info.version', version)
+	def writer = new FileWriter(file('src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'))
 	try {
 		props.store(writer, 'Generated build properties')
 		writer.flush()
@@ -70,7 +70,7 @@ pitest {
 }
 
 setBuildProperties {
-	outputs.file 'src/main/resources/uk/me/eddies/apps/sudoku/build.properties'
+	outputs.file 'src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'
 }
 
 processResources {
