@@ -52,25 +52,24 @@ task testJar(type: Jar) {
 	from sourceSets.test.output
 }
 
-task setBuildProperties << {
-	def props = new Properties()
-	props.put('uk.me.eddies.apps.sudoku.info.version', version)
-	def writer = new FileWriter(file('src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'))
-	try {
-		props.store(writer, 'Generated build properties')
-		writer.flush()
-	} finally {
-		writer.close()
+task setBuildProperties {
+	outputs.file 'src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'
+	doLast {
+		def props = new Properties()
+		props.put('uk.me.eddies.apps.sudoku.info.version', version)
+		def writer = new FileWriter(file('src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'))
+		try {
+			props.store(writer, 'Generated build properties')
+			writer.flush()
+		} finally {
+			writer.close()
+		}
 	}
 }
 
 pitest {
 	threads = 1
 	outputFormats = ['XML', 'HTML']
-}
-
-setBuildProperties {
-	outputs.file 'src/main/resources/uk/me/eddies/apps/sudoku/info/build.properties'
 }
 
 processResources {
