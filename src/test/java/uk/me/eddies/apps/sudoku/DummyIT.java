@@ -8,7 +8,7 @@ import org.junit.Test;
 public class DummyIT {
 
 	@Test
-	public void shouldSkipThisDummyTest() {
+	public void shouldSkipThisDummyIT() {
 		Assume.assumeTrue(false);
 	}
 }
