@@ -21,32 +21,17 @@ public class CellTest {
 	
 	@Before
 	public void setUp() {
-		systemUnderTest = new Cell<>(COORD, OptionalInt.of(5), 9);
+		systemUnderTest = new Cell<>(COORD, OptionalInt.of(5));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithoutCoordinate() {
-		new Cell<Coordinate2D>(null, OptionalInt.of(5), 9);
+		new Cell<Coordinate2D>(null, OptionalInt.of(5));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullValue() {
-		new Cell<>(COORD, null, 9);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldFailToConstructWithNegativePuzzleSize() {
-		new Cell<>(COORD, OptionalInt.empty(), -1);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldFailToConstructWithZeroPuzzleSize() {
-		new Cell<>(COORD, OptionalInt.empty(), 0);
-	}
-	
-	@Test
-	public void shouldSuccessfullyConstructWithOnePuzzleSize() {
-		new Cell<>(COORD, OptionalInt.of(0), 1);
+		new Cell<>(COORD, null);
 	}
 	
 	@Test
@@ -73,41 +58,10 @@ public class CellTest {
 	}
 	
 	@Test
-	public void shouldFailToSetNegativeValue() {
-		try {
-			systemUnderTest.setValue(OptionalInt.of(-1));
-			fail();
-		} catch (IllegalArgumentException expected) {
-			// Expected
-		}
-		assertThat(systemUnderTest.hasValue(), equalTo(true));
-		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(5)));
-	}
-	
-	@Test
-	public void shouldFailToSetTooHighValue() {
-		try {
-			systemUnderTest.setValue(OptionalInt.of(9));
-			fail();
-		} catch (IllegalArgumentException expected) {
-			// Expected
-		}
-		assertThat(systemUnderTest.hasValue(), equalTo(true));
-		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(5)));
-	}
-	
-	@Test
-	public void shouldSetNewValueLowBorder() {
+	public void shouldSetNewValue() {
 		systemUnderTest.setValue(OptionalInt.of(0));
 		assertThat(systemUnderTest.hasValue(), equalTo(true));
 		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(0)));
-	}
-	
-	@Test
-	public void shouldSetNewValueHighBorder() {
-		systemUnderTest.setValue(OptionalInt.of(8));
-		assertThat(systemUnderTest.hasValue(), equalTo(true));
-		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(8)));
 	}
 	
 	@Test

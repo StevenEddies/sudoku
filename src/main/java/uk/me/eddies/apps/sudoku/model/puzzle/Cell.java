@@ -14,14 +14,10 @@ import uk.me.eddies.apps.sudoku.model.type.Coordinate;
 public class Cell <C extends Coordinate> {
 
 	private final C coordinate;
-	private final int puzzleSize;
 	private OptionalInt value;
 	
-	Cell(C coordinate, OptionalInt value, int puzzleSize) {
+	Cell(C coordinate, OptionalInt value) {
 		this.coordinate = requireNonNull(coordinate);
-		if (puzzleSize <= 0)
-			throw new IllegalArgumentException(String.format("Invalid puzzle size %d (must be greater than 0).", puzzleSize));
-		this.puzzleSize = puzzleSize;
 		setValue(value);
 	}
 
@@ -34,10 +30,6 @@ public class Cell <C extends Coordinate> {
 	}
 	
 	void setValue(OptionalInt value) {
-		value.ifPresent(v -> {
-			if ((v < 0) || (v >= puzzleSize))
-				throw new IllegalArgumentException(String.format("Invalid value %d for puzzle size %d.", v, puzzleSize));
-		});
 		this.value = requireNonNull(value);
 	}
 	
