@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.util.OptionalInt;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,17 +22,38 @@ public class CellTest {
 	
 	@Before
 	public void setUp() {
-		systemUnderTest = new Cell<>(COORD, OptionalInt.of(5));
+		systemUnderTest = new Cell<>(COORD, false, OptionalInt.of(5));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithoutCoordinate() {
-		new Cell<Coordinate2D>(null, OptionalInt.of(5));
+		new Cell<Coordinate2D>(null, false, OptionalInt.of(5));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullValue() {
-		new Cell<>(COORD, null);
+		new Cell<>(COORD, false, null);
+	}
+	
+	@Test
+	public void shouldConstructWithEmptyValue() {
+		systemUnderTest = new Cell<>(COORD, false, OptionalInt.empty());
+		assertThat(systemUnderTest.hasValue(), equalTo(false));
+		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.empty()));
+		assertThat(systemUnderTest.isGiven(), equalTo(false));
+	}
+	
+	@Test
+	public void shouldConstructAsGiven() {
+		systemUnderTest = new Cell<>(COORD, true, OptionalInt.of(5));
+		assertThat(systemUnderTest.hasValue(), equalTo(true));
+		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(5)));
+		assertThat(systemUnderTest.isGiven(), equalTo(true));
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void shouldFailToConstructAsGivenWithEmptyValue() {
+		new Cell<>(COORD, true, OptionalInt.empty());
 	}
 	
 	@Test
@@ -43,6 +65,11 @@ public class CellTest {
 	public void shouldMakeValueAvailable() {
 		assertThat(systemUnderTest.hasValue(), equalTo(true));
 		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(5)));
+	}
+	
+	@Test
+	public void shouldMakeGivenFlagAvailable() {
+		assertThat(systemUnderTest.isGiven(), equalTo(false));
 	}
 	
 	@Test
@@ -69,5 +96,40 @@ public class CellTest {
 		systemUnderTest.setValue(OptionalInt.empty());
 		assertThat(systemUnderTest.hasValue(), equalTo(false));
 		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.empty()));
+	}
+	
+	@Test
+	public void shouldFailToSetNewValueWhenGiven() {
+		systemUnderTest.setGiven(true);
+		Assume.assumeThat(systemUnderTest.isGiven(), equalTo(true));
+		
+		try {
+			systemUnderTest.setValue(OptionalInt.of(0));
+			fail();
+		} catch (IllegalStateException expected) {
+			// Expected
+		}
+		assertThat(systemUnderTest.hasValue(), equalTo(true));
+		assertThat(systemUnderTest.getValue(), equalTo(OptionalInt.of(5)));
+	}
+	
+	@Test
+	public void shouldSetToGiven() {
+		systemUnderTest.setGiven(true);
+		assertThat(systemUnderTest.isGiven(), equalTo(true));
+	}
+	
+	@Test
+	public void shouldFailToSetToGivenWhenValueIsEmpty() {
+		systemUnderTest.setValue(OptionalInt.empty());
+		Assume.assumeThat(systemUnderTest.hasValue(), equalTo(false));
+		
+		try {
+			systemUnderTest.setGiven(true);
+			fail();
+		} catch (IllegalStateException expected) {
+			// Expected
+		}
+		assertThat(systemUnderTest.isGiven(), equalTo(false));
 	}
 }
