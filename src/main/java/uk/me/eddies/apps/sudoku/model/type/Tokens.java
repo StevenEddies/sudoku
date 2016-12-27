@@ -18,8 +18,6 @@ import java.util.stream.IntStream;
  */
 public final class Tokens {
 	
-	// TODO use
-
 	private final List<String> tokens;
 	private final Map<String, Integer> tokenIndices;
 	
