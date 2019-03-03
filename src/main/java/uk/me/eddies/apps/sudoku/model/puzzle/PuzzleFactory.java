@@ -4,6 +4,8 @@ package uk.me.eddies.apps.sudoku.model.puzzle;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import uk.me.eddies.apps.sudoku.model.type.Coordinate;
@@ -30,18 +32,30 @@ public class PuzzleFactory <C extends Coordinate> {
 	
 	public Puzzle<C> withData(Map<C, Integer> givenValues, Map<C, Integer> userValues) {
 		Puzzle<C> puzzle = createBlank();
-		populate(puzzle, givenValues, true);
-		populate(puzzle, userValues, false);
-		return puzzle;
+		puzzle.getLock().writeLock().lock();
+		try {
+			populate(puzzle, givenValues, true);
+			populate(puzzle, userValues, false);
+			return puzzle;
+		} finally {
+			puzzle.getLock().writeLock().unlock();
+		}
 	}
 	
 	public Puzzle<C> clone(Puzzle<C> original) {
 		if (!original.getType().equals(type))
 			throw new IllegalStateException("Cannot clone puzzle of wrong type.");
 		Puzzle<C> puzzle = createBlank();
-		populate(puzzle, extract(original, true), true);
-		populate(puzzle, extract(original, false), false);
-		return puzzle;
+		puzzle.getLock().writeLock().lock();
+		original.getLock().readLock().lock();
+		try {
+			populate(puzzle, extract(original, true), true);
+			populate(puzzle, extract(original, false), false);
+			return puzzle;
+		} finally {
+			original.getLock().readLock().unlock();
+			puzzle.getLock().writeLock().unlock();
+		}
 	}
 	
 	private void populate(Puzzle<C> puzzle, Map<C, Integer> values, boolean given) {
@@ -62,7 +76,13 @@ public class PuzzleFactory <C extends Coordinate> {
 	}
 
 	private Puzzle<C> createBlank() {
-		CellLocator<C> cellLocator = new CellLocator<>(c -> new Cell<>(c, type.getValueTokens(), false, Optional.empty()));
-		return new Puzzle<>(type, cellLocator, gt -> new Group<>(gt, cellLocator));
+		ReadWriteLock lock = new ReentrantReadWriteLock(false);
+		lock.writeLock().lock();
+		try {
+			CellLocator<C> cellLocator = new CellLocator<>(c -> new Cell<>(lock, c, type.getValueTokens(), false, Optional.empty()));
+			return new Puzzle<>(lock, type, cellLocator, gt -> new Group<>(gt, cellLocator));
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 }

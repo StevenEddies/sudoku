@@ -1,4 +1,4 @@
-/* Copyright Steven Eddies, 2017. See the LICENCE file in the project root. */
+/* Copyright Steven Eddies, 2017-2019. See the LICENCE file in the project root. */
 
 package uk.me.eddies.apps.sudoku.model.puzzle;
 
@@ -14,6 +14,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import org.junit.Before;
@@ -34,7 +36,8 @@ public class PuzzleTest {
 	@Mock private Cell<Coordinate> cell1;
 	@Mock private Cell<Coordinate> cell2;
 	@Mock private Group<Coordinate> group;
-	
+
+	private ReadWriteLock lock;
 	private GroupType<Coordinate> groupType;
 	private PuzzleType<Coordinate> type;
 
@@ -43,7 +46,8 @@ public class PuzzleTest {
 	@Before
 	public void setUp() {
 		initMocks(this);
-		
+
+		lock = new ReentrantReadWriteLock(false);
 		groupType = new GroupType<>(new LinkedHashSet<>(Arrays.asList(coord1, coord2)));
 		type = new PuzzleType<>("Irrelevant", 2,
 				new LinkedHashSet<>(Arrays.asList(coord1, coord2)),
@@ -54,22 +58,22 @@ public class PuzzleTest {
 		when(groupFactory.apply(groupType)).thenReturn(group);
 		when(group.getType()).thenReturn(groupType);
 		
-		systemUnderTest = new Puzzle<>(type, locator, groupFactory);
+		systemUnderTest = new Puzzle<>(lock, type, locator, groupFactory);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullType() {
-		new Puzzle<>(null, locator, groupFactory);
+		new Puzzle<>(lock, null, locator, groupFactory);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullCellLocator() {
-		new Puzzle<>(type, null, groupFactory);
+		new Puzzle<>(lock, type, null, groupFactory);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullGroupFactory() {
-		new Puzzle<>(type, locator, null);
+		new Puzzle<>(lock, type, locator, null);
 	}
 	
 	@Test
@@ -106,18 +110,18 @@ public class PuzzleTest {
 	@Test(expected=RuntimeException.class)
 	public void shouldFailToConstructWhenFactoryFails() {
 		when(groupFactory.apply(groupType)).thenThrow(new RuntimeException());
-		new Puzzle<>(type, locator, groupFactory);
+		new Puzzle<>(lock, type, locator, groupFactory);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWhenFactoryReturnsNull() {
 		when(groupFactory.apply(groupType)).thenReturn(null);
-		new Puzzle<>(type, locator, groupFactory);
+		new Puzzle<>(lock, type, locator, groupFactory);
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void shouldFailToConstructWhenFactoryReturnsInvalidGroup() {
 		when(group.getType()).thenReturn(new GroupType<>(emptySet()));
-		new Puzzle<>(type, locator, groupFactory);
+		new Puzzle<>(lock, type, locator, groupFactory);
 	}
 }

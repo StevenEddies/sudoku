@@ -1,4 +1,4 @@
-/* Copyright Steven Eddies, 2016. See the LICENCE file in the project root. */
+/* Copyright Steven Eddies, 2016-2019. See the LICENCE file in the project root. */
 
 package uk.me.eddies.apps.sudoku.model.puzzle;
 
@@ -8,7 +8,8 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Optional;
-
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,34 +24,36 @@ public class CellTest {
 	private static final String TOKEN_2 = "C";
 	private static final Coordinate2D COORD = new Coordinate2D(1, 0);
 	
+	private ReadWriteLock lock;
 	private Tokens tokens;
 	
 	private Cell<Coordinate2D> systemUnderTest;
 	
 	@Before
 	public void setUp() {
+		lock = new ReentrantReadWriteLock(false);
 		tokens = new Tokens(Arrays.asList(TOKEN_0, TOKEN_1, TOKEN_2));
-		systemUnderTest = new Cell<>(COORD, tokens, false, Optional.of(2));
+		systemUnderTest = new Cell<>(lock, COORD, tokens, false, Optional.of(2));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithoutCoordinate() {
-		new Cell<Coordinate2D>(null, tokens, false, Optional.of(2));
+		new Cell<Coordinate2D>(lock, null, tokens, false, Optional.of(2));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithoutTokens() {
-		new Cell<Coordinate2D>(COORD, null, false, Optional.of(2));
+		new Cell<Coordinate2D>(lock, COORD, null, false, Optional.of(2));
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void shouldFailToConstructWithNullValue() {
-		new Cell<>(COORD, tokens, false, null);
+		new Cell<>(lock, COORD, tokens, false, null);
 	}
 	
 	@Test
 	public void shouldConstructWithEmptyValue() {
-		systemUnderTest = new Cell<>(COORD, tokens, false, Optional.empty());
+		systemUnderTest = new Cell<>(lock, COORD, tokens, false, Optional.empty());
 		assertThat(systemUnderTest.hasValue(), equalTo(false));
 		assertThat(systemUnderTest.getValue(), equalTo(Optional.empty()));
 		assertThat(systemUnderTest.isGiven(), equalTo(false));
@@ -58,7 +61,7 @@ public class CellTest {
 	
 	@Test
 	public void shouldConstructAsGiven() {
-		systemUnderTest = new Cell<>(COORD, tokens, true, Optional.of(2));
+		systemUnderTest = new Cell<>(lock, COORD, tokens, true, Optional.of(2));
 		assertThat(systemUnderTest.hasValue(), equalTo(true));
 		assertThat(systemUnderTest.getValue(), equalTo(Optional.of(2)));
 		assertThat(systemUnderTest.isGiven(), equalTo(true));
@@ -66,7 +69,7 @@ public class CellTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void shouldFailToConstructAsGivenWithEmptyValue() {
-		new Cell<>(COORD, tokens, true, Optional.empty());
+		new Cell<>(lock, COORD, tokens, true, Optional.empty());
 	}
 	
 	@Test
