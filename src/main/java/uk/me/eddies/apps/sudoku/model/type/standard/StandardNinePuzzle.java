@@ -16,6 +16,8 @@ import uk.me.eddies.apps.sudoku.model.type.Tokens;
  * Standard puzzle type for normal 9x9 Sudoku grids.
  */
 public class StandardNinePuzzle {
+	
+	// TODO: test
 
 	public static final PuzzleType<Coordinate2D> TYPE = build();
 	
