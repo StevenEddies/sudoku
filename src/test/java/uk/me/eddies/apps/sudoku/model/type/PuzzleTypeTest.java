@@ -4,15 +4,12 @@ package uk.me.eddies.apps.sudoku.model.type;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -36,7 +33,7 @@ public class PuzzleTypeTest {
 	private GroupType<Coordinate2D> group1;
 	private GroupType<Coordinate2D> group2;
 	private Set<GroupType<Coordinate2D>> groups;
-	private List<String> tokens;
+	private Tokens tokens;
 
 	private PuzzleType<Coordinate2D> systemUnderTest;
 	
@@ -46,7 +43,7 @@ public class PuzzleTypeTest {
 		group1 = new GroupType<>(new LinkedHashSet<>(Arrays.asList(CELL1, CELL2)));
 		group2 = new GroupType<>(new LinkedHashSet<>(Arrays.asList(CELL2, CELL3)));
 		groups = new LinkedHashSet<>(Arrays.asList(group1, group2));
-		tokens = new ArrayList<>(Arrays.asList("0", "1"));
+		tokens = new Tokens(Arrays.asList("0", "1"));
 		systemUnderTest = new PuzzleType<>(NAME, 2, cells, groups, tokens);
 	}
 	
@@ -105,11 +102,6 @@ public class PuzzleTypeTest {
 		new PuzzleType<>(NAME, 2, cells, groups, null);
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void shouldFailToConstructWithNullToken() {
-		new PuzzleType<>(NAME, 2, cells, groups, singletonList(null));
-	}
-	
 	@Test
 	public void shouldIgnoreChangeInOriginalCellsCollection() {
 		cells.clear();
@@ -132,17 +124,6 @@ public class PuzzleTypeTest {
 		systemUnderTest.getGroups().clear();
 	}
 	
-	@Test
-	public void shouldIgnoreChangeInOriginalTokensCollection() {
-		tokens.clear();
-		assertThat(systemUnderTest.getValueTokens(), hasSize(2));
-	}
-	
-	@Test(expected=UnsupportedOperationException.class)
-	public void shouldFailToModifyReturnedTokensCollection() {
-		systemUnderTest.getValueTokens().clear();
-	}
-	
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldFailToConstructWithWrongSizeGroup() {
 		GroupType<Coordinate2D> badGroup = new GroupType<>(new LinkedHashSet<>(Arrays.asList(CELL1, CELL2, CELL3)));
@@ -151,7 +132,7 @@ public class PuzzleTypeTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldFailToConstructWithWrongTokenCount() {
-		List<String> badTokens = Arrays.asList("1", "3", "5");
+		Tokens badTokens = new Tokens(Arrays.asList("1", "3", "5"));
 		new PuzzleType<>(NAME, 2, cells, groups, badTokens);
 	}
 	
@@ -188,11 +169,11 @@ public class PuzzleTypeTest {
 		Set<GroupType<Coordinate2D>> sameGroups = new LinkedHashSet<>(Arrays.asList(
 				new GroupType<>(new LinkedHashSet<>(Arrays.asList(CELL1, CELL2))),
 				new GroupType<>(new LinkedHashSet<>(Arrays.asList(CELL2, CELL3)))));
-		List<String> sameTokens = Arrays.asList("0", "1");
+		Tokens sameTokens = new Tokens(Arrays.asList("0", "1"));
 		
 		Set<Coordinate2D> moreCells = new LinkedHashSet<>(Arrays.asList(CELL1, CELL2, CELL3, CELL4));
-		List<String> otherTokens = Arrays.asList("0", "2");
-		List<String> moreTokens = Arrays.asList("0", "1", "2");
+		Tokens otherTokens = new Tokens(Arrays.asList("0", "2"));
+		Tokens moreTokens = new Tokens(Arrays.asList("0", "1", "2"));
 		
 		return new Object[][] {
 			{ new PuzzleType<>("", 2, sameCells, sameGroups, sameTokens) },

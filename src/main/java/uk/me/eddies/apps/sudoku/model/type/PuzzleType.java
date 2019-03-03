@@ -2,13 +2,10 @@
 
 package uk.me.eddies.apps.sudoku.model.type;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,14 +18,14 @@ public final class PuzzleType <C extends Coordinate> {
 	private final int size;
 	private final Set<C> cells;
 	private final Set<GroupType<C>> groups;
-	private final List<String> valueTokens;
+	private final Tokens valueTokens;
 	
 	public PuzzleType(
 			String name,
 			int size,
 			Set<C> cells,
 			Set<GroupType<C>> groups,
-			List<String> valueTokens
+			Tokens valueTokens
 	) {
 		this.name = requireNonNull(name);
 		this.size = size;
@@ -40,10 +37,8 @@ public final class PuzzleType <C extends Coordinate> {
 		this.groups.forEach(g -> g.requireSize(this.size));
 		this.groups.forEach(g -> g.validateCells(this.cells));
 		
-		this.valueTokens = unmodifiableList(new ArrayList<>(valueTokens));
-		this.valueTokens.forEach(Objects::requireNonNull);
-		if (this.valueTokens.size() != this.size)
-			throw new IllegalArgumentException("Invalid value tokens size.");
+		this.valueTokens = requireNonNull(valueTokens);
+		this.valueTokens.requireCount(size);
 	}
 
 	public String getName() {
@@ -62,7 +57,7 @@ public final class PuzzleType <C extends Coordinate> {
 		return groups;
 	}
 	
-	public List<String> getValueTokens() {
+	public Tokens getValueTokens() {
 		return valueTokens;
 	}
 	
